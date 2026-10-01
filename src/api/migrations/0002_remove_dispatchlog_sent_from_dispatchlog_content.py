@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0001_initial'),
+        ("api", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='dispatchlog',
-            name='sent_from',
+            model_name="dispatchlog",
+            name="sent_from",
         ),
         migrations.AddField(
-            model_name='dispatchlog',
-            name='content',
-            field=models.TextField(default='ola', max_length=15000),
+            model_name="dispatchlog",
+            name="content",
+            field=models.TextField(default="ola", max_length=15000),
             preserve_default=False,
         ),
     ]

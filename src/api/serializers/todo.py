@@ -53,13 +53,9 @@ class LinkerTaskTodoSerializer(serializers.ModelSerializer):
         todo = data.get("todo")
         tarefa = data.get("tarefa")
         if todo and todo.user != request.user:
-            raise serializers.ValidationError(
-                {"todo": "Você não tem permissão para esta tarefa."}
-            )
+            raise serializers.ValidationError({"todo": "Você não tem permissão para esta tarefa."})
         if tarefa and tarefa.user != request.user:
-            raise serializers.ValidationError(
-                {"tarefa": "Você não tem permissão para esta lista."}
-            )
+            raise serializers.ValidationError({"tarefa": "Você não tem permissão para esta lista."})
         return data
 
     def create(self, validated_data):
@@ -133,9 +129,7 @@ class TodoSerializer(serializers.ModelSerializer):
         if value is None:
             return value
         if value.user != request.user and not value.pode_editar(request.user):
-            raise serializers.ValidationError(
-                "Você não tem permissão para usar esta pasta."
-            )
+            raise serializers.ValidationError("Você não tem permissão para usar esta pasta.")
         return value
 
     def create(self, validated_data):

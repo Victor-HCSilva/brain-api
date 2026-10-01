@@ -19,8 +19,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.50'     # 50% de 1 núcleo de CPU
-          memory: 256M     # Suficiente para dev local no Postgres
+          cpus: '0.50'     
+          memory: 256M     
 
   redis:
     image: redis:7-alpine
@@ -36,8 +36,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'     # Redis é levíssimo, 25% de 1 núcleo
-          memory: 128M     # Espaço de sobra para filas de mensageria local
+          cpus: '0.25'    
+          memory: 128M    
 
   api:
     build:
@@ -60,8 +60,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.80'     # Permite recarregar rápido o código no runserver
-          memory: 512M     # Espaço seguro para o Django carregar dependências e ORM
+          cpus: '0.80'    
+          memory: 512M    
 
   celery_worker:
     build:
@@ -69,7 +69,6 @@ services:
       dockerfile: .docker/dockerfile/Dockerfile
     container_name: brain_celery_worker
     restart: always
-    # DICA: Adicionado --concurrency=1 para não criar múltiplos processos na sua máquina
     command: python -m celery -A core worker -l info --concurrency=1
     volumes:
       - ../src:/app/src

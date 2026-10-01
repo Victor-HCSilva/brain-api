@@ -9,7 +9,6 @@ from django.db import transaction
 from rest_framework import status
 
 
-
 class ColorsViewSet(viewsets.ModelViewSet):
     serializer_class = ColorsSerializer
     permission_classes = [IsAuthenticated, IsAgendaOwner]
@@ -50,7 +49,7 @@ class AgendaModelViewSet(viewsets.ModelViewSet):
             # 3. Cria o Reminder vinculado à agenda recém-criada
             reminder = Reminder.objects.create(
                 descricao=agenda.titulo,
-                agenda=agenda  # Passa a instância diretamente
+                agenda=agenda,  # Passa a instância diretamente
             )
 
         # 4. Serializa o Reminder (ou monta o dicionário manualmente)
@@ -62,9 +61,6 @@ class AgendaModelViewSet(viewsets.ModelViewSet):
 
         # 5. Retorna a resposta customizada
         return Response(
-            {
-                "reminder": reminder_data,
-                "evento": serializer.data
-            },
-            status=status.HTTP_201_CREATED
+            {"reminder": reminder_data, "evento": serializer.data},
+            status=status.HTTP_201_CREATED,
         )

@@ -107,9 +107,7 @@ def show(request, id_user, id_anotacao):
 
     # SEGURANÇA: Se não for dono e não for colaborador, bloqueia
     if not task.pode_editar(request.user):
-        return HttpResponseForbidden(
-            "Você não tem permissão para visualizar esta anotação."
-        )
+        return HttpResponseForbidden("Você não tem permissão para visualizar esta anotação.")
 
     img_form = ImageForm()
     # O user aqui deve ser o logado para filtrar os checklists DELE
@@ -145,9 +143,9 @@ def show(request, id_user, id_anotacao):
 
                 return redirect("main:show", id_user=id_user, id_anotacao=id_anotacao)
 
-    tarefas_vinculadas = LinkerTaskTodo.objects.filter(
-        todo=task, is_active=True
-    ).select_related("tarefa")
+    tarefas_vinculadas = LinkerTaskTodo.objects.filter(todo=task, is_active=True).select_related(
+        "tarefa"
+    )
 
     # Corrigido para usar a relação 'imagens' definida no model
     imgs = task.imagens.all()
@@ -192,9 +190,7 @@ def remover(request, id_user, id_anotacao):
 
     # APENAS O DONO ou o DONO DA PASTA pode remover
     if not todo.pode_excluir(request.user):
-        return HttpResponseForbidden(
-            "Apenas o proprietário pode excluir esta anotação."
-        )
+        return HttpResponseForbidden("Apenas o proprietário pode excluir esta anotação.")
 
     if request.method == "POST":
         todo.is_active = False
@@ -431,9 +427,9 @@ def gerenciar_colaboradores(request, tipo, pk):
 @login_required
 def listar_grupos(request):
     """Lista todos os grupos criados pelo usuário"""
-    grupos = CollaborationGroup.objects.filter(
-        owner=request.user, is_active=True
-    ).prefetch_related("membros")
+    grupos = CollaborationGroup.objects.filter(owner=request.user, is_active=True).prefetch_related(
+        "membros"
+    )
 
     context = {
         "grupos": grupos,
@@ -466,9 +462,7 @@ def criar_grupo(request):
 @login_required
 def editar_grupo(request, grupo_id):
     """Edita um grupo de colaboração"""
-    grupo = get_object_or_404(
-        CollaborationGroup, id=grupo_id, owner=request.user, is_active=True
-    )
+    grupo = get_object_or_404(CollaborationGroup, id=grupo_id, owner=request.user, is_active=True)
 
     if request.method == "POST":
         form = CollaborationGroupForm(request.POST, instance=grupo, user=request.user)
@@ -490,9 +484,7 @@ def editar_grupo(request, grupo_id):
 @login_required
 def deletar_grupo(request, grupo_id):
     """Deleta um grupo de colaboração"""
-    grupo = get_object_or_404(
-        CollaborationGroup, id=grupo_id, owner=request.user, is_active=True
-    )
+    grupo = get_object_or_404(CollaborationGroup, id=grupo_id, owner=request.user, is_active=True)
 
     if request.method == "POST":
         grupo.is_active = False
@@ -509,9 +501,7 @@ def deletar_grupo(request, grupo_id):
 @login_required
 def gerenciar_membros_grupo(request, grupo_id):
     """Gerencia membros de um grupo (adiciona/remove usuários)"""
-    grupo = get_object_or_404(
-        CollaborationGroup, id=grupo_id, owner=request.user, is_active=True
-    )
+    grupo = get_object_or_404(CollaborationGroup, id=grupo_id, owner=request.user, is_active=True)
 
     # Lógica para ADICIONAR membro
     if request.method == "POST" and "add_user" in request.POST:
@@ -534,9 +524,7 @@ def gerenciar_membros_grupo(request, grupo_id):
         user_id = request.POST.get("user_id")
         user_to_remove = get_object_or_404(User, id=user_id)
         grupo.remover_membro(user_to_remove)
-        messages.success(
-            request, f"Membro {user_to_remove.username} removido do grupo."
-        )
+        messages.success(request, f"Membro {user_to_remove.username} removido do grupo.")
         return redirect(request.path)
 
     membros = grupo.membros.all()

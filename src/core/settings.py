@@ -28,6 +28,7 @@ def get_env_bool(name: str, default: bool = False) -> bool:
         return default
     return val.strip().lower() in ("true", "1", "t", "yes")
 
+
 DEBUG = get_env_bool("DEBUG", default=False)
 LOGIN_URL = "main:login"
 LOGOUT_REDIRECT_URL = "main:create_account"
@@ -40,9 +41,9 @@ if not SECRET_KEY:
     else:
         raise ValueError("A variável SECRET_KEY precisa estar definida em produção!")
 
-ALLOWED_HOSTS = [url for url in os.getenv("TRUSTED_ORIGINS", "localhost,10.0.0.108").split(',')]
+ALLOWED_HOSTS = [url for url in os.getenv("TRUSTED_ORIGINS", "localhost,10.0.0.108").split(",")]
 CSRF_TRUSTED_ORIGINS = [
-    f"http://{url}" for url in os.getenv("TRUSTED_ORIGINS", "localhost,10.0.0.108").split(',')
+    f"http://{url}" for url in os.getenv("TRUSTED_ORIGINS", "localhost,10.0.0.108").split(",")
 ]
 
 if not DEBUG and not ALLOWED_HOSTS:
@@ -134,6 +135,7 @@ DATABASES = {
 
 try:
     import django_redis  # noqa: F401
+
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
@@ -208,9 +210,9 @@ CELERY_RESULT_BACKEND = REDIS
 CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_BEAT_SCHEDULE = {
-    'send-daily-summaries': {
-        'task': 'api.tasks.send_summarie_massive',
-        'schedule': crontab(hour=6, minute=0),
+    "send-daily-summaries": {
+        "task": "api.tasks.send_summarie_massive",
+        "schedule": crontab(hour=6, minute=0),
     },
 }
 

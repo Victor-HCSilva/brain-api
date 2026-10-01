@@ -1,0 +1,37 @@
+[tool.ruff]
+# Limite de 100 caracteres por linha
+line-length = 100
+
+# Versão mínima do Python do projeto (ajuste se necessário)
+target-version = "py311"
+
+# Diretórios e arquivos a serem ignorados
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+# Regras ativas:
+# E / W: Erros de estilo padrão (pycodestyle)
+# F: Erros lógicos/bugs (Pyflakes)
+# I: Organização automática de imports (isort)
+select = ["E", "W", "F", "I"]
+
+# Regras a serem ignoradas (adicione códigos aqui se necessário, ex: "E501")
+ignore = []
+
+# Permite correção automática de regras compatíveis
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+# Configurações do formatador de código
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

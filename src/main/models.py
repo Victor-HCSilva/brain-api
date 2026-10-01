@@ -13,8 +13,9 @@ from core.models.mixins import ActivableAndTimeStamp
 # --- MANAGER PARA LÓGICA DE COLABORAÇÃO ---
 
 
-MAX_LENGTH=100
-TEXT_AREA_LIMIT=15000
+MAX_LENGTH = 100
+TEXT_AREA_LIMIT = 15000
+
 
 class TodoQuerySet(models.QuerySet):
     def para_usuario(self, user):
@@ -62,13 +63,9 @@ class CollaborationGroup(ActivableAndTimeStamp):
 
     name = models.CharField(max_length=MAX_LENGTH)
     descricao = models.TextField(default="", blank=True, max_length=MAX_LENGTH)
-    owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="grupos_que_criei"
-    )
-    membros = models.ManyToManyField(
-        User, related_name="grupos_que_participo", blank=True
-    )
-   
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="grupos_que_criei")
+    membros = models.ManyToManyField(User, related_name="grupos_que_participo", blank=True)
+
     class Meta:
         unique_together = ["name", "owner"]
         ordering = ["-created_at"]
@@ -99,17 +96,12 @@ class CollaborationGroup(ActivableAndTimeStamp):
 
 
 class Folder(ActivableAndTimeStamp):
-    name = models.CharField( default="folder", max_length=MAX_LENGTH)
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="minhas_pastas"
-    )
-    colaboradores = models.ManyToManyField(
-        User, related_name="pastas_compartilhadas", blank=True
-    )
+    name = models.CharField(default="folder", max_length=MAX_LENGTH)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="minhas_pastas")
+    colaboradores = models.ManyToManyField(User, related_name="pastas_compartilhadas", blank=True)
     grupos_colaboracao = models.ManyToManyField(
         CollaborationGroup, related_name="pastas_compartilhadas", blank=True
     )
-    
 
     def __str__(self):
         return f"{self.name}"
@@ -167,7 +159,9 @@ class Todo(ActivableAndTimeStamp):
     titulo = models.CharField(max_length=MAX_LENGTH, default="Sem titulo")
     favorito = models.BooleanField(default=False)
     completo = models.BooleanField(default=False)
-    anotacao = models.TextField(("Anotação"), default="Escreva algo aqui!", max_length=TEXT_AREA_LIMIT)
+    anotacao = models.TextField(
+        ("Anotação"), default="Escreva algo aqui!", max_length=TEXT_AREA_LIMIT
+    )
     prioridade = models.CharField(choices=PRIORIDADES, max_length=MAX_LENGTH, default="Baixa")
     tag = models.CharField(choices=TAGS, max_length=MAX_LENGTH, default="Avulso")
     prazo_inicial = models.DateTimeField(
@@ -181,9 +175,7 @@ class Todo(ActivableAndTimeStamp):
     folder = models.ForeignKey(
         Folder, on_delete=models.CASCADE, blank=True, null=True, related_name="todos"
     )
-    colaboradores = models.ManyToManyField(
-        User, related_name="todos_compartilhados", blank=True
-    )
+    colaboradores = models.ManyToManyField(User, related_name="todos_compartilhados", blank=True)
     grupos_colaboracao = models.ManyToManyField(
         CollaborationGroup, related_name="todos_compartilhados", blank=True
     )
@@ -254,6 +246,7 @@ def _upload_imagem_path(instance, filename):
     """
     import uuid
     import os
+
     ext = os.path.splitext(filename)[1].lower()
     return f"imgs/{uuid.uuid4().hex}{ext}"
 
@@ -265,7 +258,7 @@ class Image(ActivableAndTimeStamp):
     data_de_criacao = models.DateTimeField(default=timezone.now)
     # Alterado para apontar para o Todo (Pai)
     todo = models.ForeignKey(Todo, on_delete=models.CASCADE, related_name="imagens")
-    observacao = models.CharField( default="Sem observação", max_length=100)
+    observacao = models.CharField(default="Sem observação", max_length=100)
 
     def __str__(self):
         return f"Imagem: {self.titulo} - Ref Todo: {self.todo.titulo}"
@@ -273,13 +266,11 @@ class Image(ActivableAndTimeStamp):
 
 class LinkerTaskTodo(ActivableAndTimeStamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    todo = models.ForeignKey(
-        Todo, on_delete=models.CASCADE, related_name="vinculos_tarefas"
-    )
+    todo = models.ForeignKey(Todo, on_delete=models.CASCADE, related_name="vinculos_tarefas")
     # Supondo que Tarefa venha de checklist.models
     tarefa = models.ForeignKey(
         "checklist.Tarefa", on_delete=models.CASCADE, related_name="vinculos_anotacoes"
-    ) 
+    )
 
     def __str__(self):
         return f"{self.user.username} | {self.todo.titulo}"

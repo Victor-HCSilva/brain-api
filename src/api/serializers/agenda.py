@@ -28,9 +28,6 @@ class ReminderSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-
-
-
 class AgendaModelSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
 
@@ -61,6 +58,7 @@ class AgendaModelSerializer(serializers.ModelSerializer):
         tipo = data.get("tipo_de_evento", "")
         if isinstance(tipo, str) and tipo.startswith("(") and "," in tipo:
             import ast
+
             try:
                 parsed = ast.literal_eval(tipo)
                 if isinstance(parsed, (tuple, list)) and parsed:
@@ -70,6 +68,7 @@ class AgendaModelSerializer(serializers.ModelSerializer):
         imp = data.get("importancia", "")
         if isinstance(imp, str) and imp.startswith("(") and "," in imp:
             import ast
+
             try:
                 parsed = ast.literal_eval(imp)
                 if isinstance(parsed, (tuple, list)) and parsed:

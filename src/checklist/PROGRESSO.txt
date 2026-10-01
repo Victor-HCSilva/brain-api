@@ -1,1 +1,0 @@
-Crie os templates necessário veja o nome em .views.py

@@ -4,18 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0002_alter_todo_prazo_final_alter_todo_prazo_inicial'),
+        ("main", "0002_alter_todo_prazo_final_alter_todo_prazo_inicial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='todo',
-            name='created_at',
+            model_name="todo",
+            name="created_at",
         ),
         migrations.RemoveField(
-            model_name='todo',
-            name='updated_at',
+            model_name="todo",
+            name="updated_at",
         ),
     ]

@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.db import models
 import smtplib
-from logging import getLogger 
+from logging import getLogger
 import os
 from django.contrib.auth.models import User
 from email.message import EmailMessage
@@ -15,59 +15,56 @@ logger = getLogger("__main__")
 try:
     from celery import shared_task
 except ImportError:
+
     def shared_task(func):
         class DummyTask:
             def __init__(self, fn):
                 self.fn = fn
+
             def __call__(self, *args, **kwargs):
                 return self.fn(*args, **kwargs)
+
             def delay(self, *args, **kwargs):
                 return self.fn(*args, **kwargs)
+
         return DummyTask(func)
 
+
 class SendEmail:
-	timeout = 5 # 5s
-	server_type = os.getenv("SERVER_TYPE")
-	port = os.getenv("EMAIL_PORT")
-	link = os.getenv("LINK_PAGINA")
-	email = os.getenv("EMAIL_SYSTEM")
-	password = os.getenv("EMAIL_PASSWORD")
-	success = "OK"
-	failure = "FAIL"
+    timeout = 5  # 5s
+    server_type = os.getenv("SERVER_TYPE")
+    port = os.getenv("EMAIL_PORT")
+    link = os.getenv("LINK_PAGINA")
+    email = os.getenv("EMAIL_SYSTEM")
+    password = os.getenv("EMAIL_PASSWORD")
+    success = "OK"
+    failure = "FAIL"
 
-	def __init__(
-		self, 
-		to_user: User,
-		content: str,
-		title: str,
-		time=3
-	) -> None:
-		self.to_user = to_user
-		self.content = content
-		self.title = title
-		self.time = time
+    def __init__(self, to_user: User, content: str, title: str, time=3) -> None:
+        self.to_user = to_user
+        self.content = content
+        self.title = title
+        self.time = time
 
-	def _idempotency(self, smtp, msg: EmailMessage, time=3) -> None:
- 		if time == 0 or cache.get(self.to_user.email) == self.success:
- 			return
+    def _idempotency(self, smtp, msg: EmailMessage, time=3) -> None:
+        if time == 0 or cache.get(self.to_user.email) == self.success:
+            return
 
- 		try:
- 			sleep(1)
- 			err = smtp.send_message(msg)
+        try:
+            sleep(1)
+            err = smtp.send_message(msg)
 
-	 		if err and cache.get(self.to_user.email) != self.success:
-	 			cache.set(self.to_user.email, self.failure)
-	 			return self._idempotency(smtp, msg, time - 1)
-	
- 			return cache.set(self.to_user.email, self.success, self.timeout)
+            if err and cache.get(self.to_user.email) != self.success:
+                cache.set(self.to_user.email, self.failure)
+                return self._idempotency(smtp, msg, time - 1)
 
- 		except (smtplib.SMTPException, Exception) as e:
- 			err = True
+            return cache.set(self.to_user.email, self.success, self.timeout)
 
+        except (smtplib.SMTPException, Exception) as e:
+            err = True
 
-		
-	def _template(self, username: str, content: str):
-		return f"""
+    def _template(self, username: str, content: str):
+        return f"""
 		<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 480px; margin: 20px auto; padding: 32px 24px 20px 24px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
     
     <!-- Título / Saudação -->
@@ -104,41 +101,38 @@ class SendEmail:
 </div>
 		"""
 
-	def send(self):
-		try:
-			if not self.to_user.email or not self.email:
-				logger.info(f"Usuário: {self.to_user.email}\nSistema: {self.email}")
-				raise ValueError("Algum erro ocorreu ao buscar emails")
+    def send(self):
+        try:
+            if not self.to_user.email or not self.email:
+                logger.info(f"Usuário: {self.to_user.email}\nSistema: {self.email}")
+                raise ValueError("Algum erro ocorreu ao buscar emails")
 
+            from_ = self.email
+            msg = EmailMessage()
+            msg["Subject"] = self.title
+            msg["From"] = from_
+            msg["To"] = self.to_user.email
+            msg.set_content(
+                self._template(content=self.content, username=self.to_user.username),
+                subtype="html",
+            )
 
-			from_ = self.email
-			msg = EmailMessage()
-			msg['Subject'] = self.title
-			msg['From'] = from_
-			msg['To'] = self.to_user.email 
-			msg.set_content(
-			    self._template(content=self.content, username=self.to_user.username), 
-			    subtype='html'
-			)
+            with smtplib.SMTP(self.server_type, self.port) as smtp:
+                smtp.starttls()
+                smtp.login(from_, self.password)
+                self._idempotency(smtp, msg, self.time)
 
-			with smtplib.SMTP(self.server_type, self.port) as smtp:
-				smtp.starttls()
-				smtp.login(from_, self.password)
-				self._idempotency(smtp, msg, self.time)
+                obj = DispatchLog.objects.create(
+                    to=self.to_user, title=self.title, content=self.content
+                )
+                logger.info(f"E-mail de {from_} para {self.to_user.email} enviado com sucesso!")
 
-				obj = DispatchLog.objects.create(
-						to=self.to_user,
-						title=self.title,
-						content=self.content
-					)
-				logger.info(f'E-mail de {from_} para {self.to_user.email} enviado com sucesso!')
+        except Exception as e:
+            logger.info(f"Erro ao enviar o email: {e}")
 
-		except Exception as e:
-			logger.info(f"Erro ao enviar o email: {e}")
-		
 
 @shared_task
-def send_delay(to_user: int | str,content: str,title: str, time=3):
-	user = get_object_or_404(User,id=to_user)
-	s = SendEmail(user, content, title,time)
-	s.send()
+def send_delay(to_user: int | str, content: str, title: str, time=3):
+    user = get_object_or_404(User, id=to_user)
+    s = SendEmail(user, content, title, time)
+    s.send()

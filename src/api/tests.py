@@ -105,9 +105,7 @@ class TodoAndFolderAPITests(APITestCase):
         unfiled_response = self.client.get(url, {"folder": "none"})
 
         self.assertEqual(folder_response.status_code, 200)
-        self.assertEqual(
-            [todo["id"] for todo in folder_response.data["results"]], [self.todo.id]
-        )
+        self.assertEqual([todo["id"] for todo in folder_response.data["results"]], [self.todo.id])
         self.assertEqual(unfiled_response.status_code, 200)
         self.assertEqual(
             [todo["id"] for todo in unfiled_response.data["results"]], [unfiled_todo.id]
@@ -125,12 +123,8 @@ class SwaggerAPITests(APITestCase):
 
 class ImageAPITests(APITestCase):
     def setUp(self):
-        self.owner = User.objects.create_user(
-            username="owner_images", password="senha123"
-        )
-        self.other = User.objects.create_user(
-            username="other_images", password="senha123"
-        )
+        self.owner = User.objects.create_user(username="owner_images", password="senha123")
+        self.other = User.objects.create_user(username="other_images", password="senha123")
         self.folder = Folder.objects.create(user=self.owner, name="Pasta de imagens")
         self.todo = Todo.objects.create(
             user=self.owner,
@@ -144,6 +138,7 @@ class ImageAPITests(APITestCase):
         self.client.force_authenticate(user=self.owner)
         url = reverse("api:image-list")
         from django.core.files.uploadedfile import SimpleUploadedFile
+
         # 1x1 transparent GIF
         gif_bytes = (
             b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04"
@@ -168,6 +163,7 @@ class ImageAPITests(APITestCase):
 
     def test_other_user_cannot_upload_image_to_todo(self):
         from django.core.files.uploadedfile import SimpleUploadedFile
+
         self.client.force_authenticate(user=self.other)
         url = reverse("api:image-list")
         gif_bytes = (

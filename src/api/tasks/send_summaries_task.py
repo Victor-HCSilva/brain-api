@@ -14,8 +14,8 @@ logger = getLogger("__name__")
 
 
 class Summarie:
-    def __init__(self) -> None :
-        return  
+    def __init__(self) -> None:
+        return
 
     def send_todos_summarie(self, user: User) -> None:
         """
@@ -48,7 +48,7 @@ class Summarie:
             ]
         ) or (
             '<li style="padding: 12px; background-color: #ffffff; border: 1px dashed'
-            ' #cbd5e1; border-radius: 6px; color: #94a3b8; font-size: 13px;'
+            " #cbd5e1; border-radius: 6px; color: #94a3b8; font-size: 13px;"
             ' text-align: center; list-style: none;">Nenhuma tarefa próxima</li>'
         )
 
@@ -65,7 +65,7 @@ class Summarie:
             ]
         ) or (
             '<li style="padding: 12px; background-color: #ffffff; border: 1px dashed'
-            ' #cbd5e1; border-radius: 6px; color: #94a3b8; font-size: 13px;'
+            " #cbd5e1; border-radius: 6px; color: #94a3b8; font-size: 13px;"
             ' text-align: center; list-style: none;">Nenhuma tarefa em atraso</li>'
         )
         formated_status_content = f""" 
@@ -100,7 +100,7 @@ class Summarie:
         """
         s = SendEmail(user, formated_status_content, "Seu resumo completo", 3)
         s.send()
-        
+
 
 @shared_task
 def _send_summarie(user_id: int | str):
@@ -118,8 +118,9 @@ def _send_summarie(user_id: int | str):
     except Exception as e:
         logger.info(f"Erro ocorrido ao tentar enviar emails: {e}")
 
+
 @shared_task
-def send_summarie_massive(filters = {"is_active": True}): #
+def send_summarie_massive(filters={"is_active": True}):  #
     """Envio a resumos de anotações para cada usuário"""
     ids = User.objects.filter(**filters).values_list("id", flat=True)
     for user_id in ids:

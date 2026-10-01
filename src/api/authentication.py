@@ -6,12 +6,12 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 class FlexibleJWTAuthentication(JWTAuthentication):
     """
     Autenticação JWT flexível e resiliente.
-    
+
     Aceita de forma transparente:
     - 'Bearer <token>' (padrão)
     - 'Bearer Bearer <token>' (duplicação acidental em clientes/proxies)
     - '<token>' direto (sem prefixo Bearer, comum em testes/Swagger/Postman)
-    
+
     Se o cabeçalho estiver vazio, contiver apenas 'Bearer' (com ou sem espaços)
     ou prefixos incompletos, retorna None de forma segura em vez de disparar
     a exceção 'bad_authorization_header' ("Cabeçalho de autorização deve conter dois valores delimitados por espaço").

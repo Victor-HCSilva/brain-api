@@ -23,9 +23,7 @@ def checklist(request):
             tarefa_id = request.POST.get("tarefa_id")
             if descricao and tarefa_id:
                 tarefa_obj = get_object_or_404(Tarefa, id=tarefa_id, user=request.user)
-                Item.objects.create(
-                    descricao=descricao, tarefa=tarefa_obj, user=request.user
-                )
+                Item.objects.create(descricao=descricao, tarefa=tarefa_obj, user=request.user)
             return redirect("checklist")
 
         # AÇÃO 3: Adicionar um Link rápido diretamente a uma Tarefa existente

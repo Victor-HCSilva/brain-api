@@ -13,9 +13,7 @@ urlpatterns = [
         name="login",
     ),
     path("home/", views.home, name="home"),
-    path(
-        "logout/", auth_views.LogoutView.as_view(next_page="main:login"), name="logout"
-    ),
+    path("logout/", auth_views.LogoutView.as_view(next_page="main:login"), name="logout"),
     path("main/<int:id_user>", views.create_todo, name="main"),
     path("welcome/<int:id_user>", views.welcome, name="welcome"),
     path("sobre", views.sobre, name="sobre"),

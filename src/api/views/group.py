@@ -77,4 +77,3 @@ class GroupViewSet(viewsets.ModelViewSet):
 
         group.remover_membro(user)
         return Response(status=status.HTTP_204_NO_CONTENT)
-

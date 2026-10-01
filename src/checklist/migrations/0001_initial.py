@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,50 +14,159 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Tarefa',
+            name="Tarefa",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('titulo', models.CharField(max_length=100)),
-                ('color', models.CharField(choices=[('red', 'Vermelho'), ('green', 'Verde'), ('blue', 'Azul'), ('yellow', 'Amarelo'), ('orange', 'Laranja'), ('purple', 'Roxo'), ('black', 'Preto'), ('white', 'Branco')], default='black', max_length=100)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("titulo", models.CharField(max_length=100)),
+                (
+                    "color",
+                    models.CharField(
+                        choices=[
+                            ("red", "Vermelho"),
+                            ("green", "Verde"),
+                            ("blue", "Azul"),
+                            ("yellow", "Amarelo"),
+                            ("orange", "Laranja"),
+                            ("purple", "Roxo"),
+                            ("black", "Preto"),
+                            ("white", "Branco"),
+                        ],
+                        default="black",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Link',
+            name="Link",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('url', models.URLField()),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='links', to=settings.AUTH_USER_MODEL)),
-                ('tarefa', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='links', to='checklist.tarefa')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("url", models.URLField()),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="links",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "tarefa",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="links",
+                        to="checklist.tarefa",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='Item',
+            name="Item",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('descricao', models.CharField(default='Item da lista', max_length=100)),
-                ('feito', models.CharField(choices=[('nao_iniciado', '⮟ Não Iniciado ⚪'), ('fazendo', '⮟ Fazendo ⏳'), ('concluido', '⮟ Concluído ✅'), ('cancelado', '⮟ Cancelado 🚫')], default='nao_iniciado', max_length=100)),
-                ('color', models.CharField(choices=[('red', 'Vermelho'), ('green', 'Verde'), ('blue', 'Azul'), ('yellow', 'Amarelo'), ('orange', 'Laranja'), ('purple', 'Roxo'), ('black', 'Preto'), ('white', 'Branco')], default='black', max_length=100)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='itens', to=settings.AUTH_USER_MODEL)),
-                ('tarefa', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='itens', to='checklist.tarefa')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "descricao",
+                    models.CharField(default="Item da lista", max_length=100),
+                ),
+                (
+                    "feito",
+                    models.CharField(
+                        choices=[
+                            ("nao_iniciado", "⮟ Não Iniciado ⚪"),
+                            ("fazendo", "⮟ Fazendo ⏳"),
+                            ("concluido", "⮟ Concluído ✅"),
+                            ("cancelado", "⮟ Cancelado 🚫"),
+                        ],
+                        default="nao_iniciado",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "color",
+                    models.CharField(
+                        choices=[
+                            ("red", "Vermelho"),
+                            ("green", "Verde"),
+                            ("blue", "Azul"),
+                            ("yellow", "Amarelo"),
+                            ("orange", "Laranja"),
+                            ("purple", "Roxo"),
+                            ("black", "Preto"),
+                            ("white", "Branco"),
+                        ],
+                        default="black",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="itens",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "tarefa",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="itens",
+                        to="checklist.tarefa",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

@@ -27,7 +27,5 @@ class ImageSerializer(serializers.ModelSerializer):
     def validate_todo(self, value):
         request = self.context["request"]
         if not value.pode_editar(request.user):
-            raise serializers.ValidationError(
-                "Você não pode anexar imagem a este Todo."
-            )
+            raise serializers.ValidationError("Você não pode anexar imagem a este Todo.")
         return value

@@ -5,25 +5,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0004_todo_created_at_todo_updated_at'),
+        ("main", "0004_todo_created_at_todo_updated_at"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='image',
-            name='data_de_criacao',
+            model_name="image",
+            name="data_de_criacao",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AlterField(
-            model_name='todo',
-            name='prazo_final',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='2026-09-27'),
+            model_name="todo",
+            name="prazo_final",
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text="2026-09-27"),
         ),
         migrations.AlterField(
-            model_name='todo',
-            name='prazo_inicial',
-            field=models.DateTimeField(default=django.utils.timezone.now, help_text='2026-09-27'),
+            model_name="todo",
+            name="prazo_inicial",
+            field=models.DateTimeField(default=django.utils.timezone.now, help_text="2026-09-27"),
         ),
     ]

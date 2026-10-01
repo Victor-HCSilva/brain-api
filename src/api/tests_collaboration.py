@@ -9,15 +9,9 @@ User = get_user_model()
 
 class CollaborationAPITests(APITestCase):
     def setUp(self):
-        self.owner = User.objects.create_user(
-            username="collab_owner", password="senha123"
-        )
-        self.member = User.objects.create_user(
-            username="collab_member", password="senha123"
-        )
-        self.other = User.objects.create_user(
-            username="collab_other", password="senha123"
-        )
+        self.owner = User.objects.create_user(username="collab_owner", password="senha123")
+        self.member = User.objects.create_user(username="collab_member", password="senha123")
+        self.other = User.objects.create_user(username="collab_other", password="senha123")
         self.group = CollaborationGroup.objects.create(
             name="Equipe API",
             owner=self.owner,
@@ -82,7 +76,5 @@ class CollaborationAPITests(APITestCase):
         self.assertEqual(response.status_code, 200)
 
         self.client.force_authenticate(user=self.member)
-        response = self.client.get(
-            reverse("api:folder-detail", kwargs={"pk": folder.id})
-        )
+        response = self.client.get(reverse("api:folder-detail", kwargs={"pk": folder.id}))
         self.assertEqual(response.status_code, 200)

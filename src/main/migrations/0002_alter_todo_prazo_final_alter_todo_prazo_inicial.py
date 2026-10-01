@@ -5,20 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('main', '0001_initial'),
+        ("main", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='todo',
-            name='prazo_final',
-            field=models.DateField(default=django.utils.timezone.now, help_text='2026-09-27'),
+            model_name="todo",
+            name="prazo_final",
+            field=models.DateField(default=django.utils.timezone.now, help_text="2026-09-27"),
         ),
         migrations.AlterField(
-            model_name='todo',
-            name='prazo_inicial',
-            field=models.DateField(default=django.utils.timezone.now, help_text='2026-09-27'),
+            model_name="todo",
+            name="prazo_inicial",
+            field=models.DateField(default=django.utils.timezone.now, help_text="2026-09-27"),
         ),
     ]

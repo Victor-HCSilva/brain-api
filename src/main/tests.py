@@ -41,9 +41,7 @@ class UnauthenticatedAccessTests(TestCase):
 
     def setUp(self):
         self.user = make_user("owner")
-        self.todo = Todo.objects.create(
-            user=self.user, titulo="Todo privado", is_active=True
-        )
+        self.todo = Todo.objects.create(user=self.user, titulo="Todo privado", is_active=True)
         self.folder = Folder.objects.create(user=self.user, name="Pasta privada")
 
     def _assert_redirects_to_login(self, url):
@@ -52,9 +50,7 @@ class UnauthenticatedAccessTests(TestCase):
         self.assertIn("/login", response["Location"])
 
     def test_anotacoes_requires_login(self):
-        self._assert_redirects_to_login(
-            reverse("main:anotacoes", kwargs={"id_user": self.user.id})
-        )
+        self._assert_redirects_to_login(reverse("main:anotacoes", kwargs={"id_user": self.user.id}))
 
     def test_show_requires_login(self):
         self._assert_redirects_to_login(
@@ -196,9 +192,7 @@ class FolderAuthorizationTests(TestCase):
     def setUp(self):
         self.user_a = make_user("folder_owner")
         self.user_b = make_user("folder_attacker")
-        self.folder_a = Folder.objects.create(
-            user=self.user_a, name="Pasta de A", is_active=True
-        )
+        self.folder_a = Folder.objects.create(user=self.user_a, name="Pasta de A", is_active=True)
 
     def test_user_b_cannot_delete_folder_of_user_a(self):
         """Usuário B não pode excluir pasta de A."""
@@ -349,9 +343,7 @@ class ColaboradorAuthorizationTests(TestCase):
     def setUp(self):
         self.user_a = make_user("colab_owner")
         self.user_b = make_user("colab_attacker")
-        self.todo_a = Todo.objects.create(
-            user=self.user_a, titulo="Todo de A", is_active=True
-        )
+        self.todo_a = Todo.objects.create(user=self.user_a, titulo="Todo de A", is_active=True)
 
     def test_user_b_cannot_manage_colaboradores_of_todo_a(self):
         """Usuário B não pode gerenciar colaboradores de um Todo que não é seu."""

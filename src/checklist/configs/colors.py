@@ -1,4 +1,3 @@
-
 COLORS = (
     ("red", "Vermelho"),
     ("green", "Verde"),

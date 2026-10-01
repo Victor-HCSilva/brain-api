@@ -8,100 +8,285 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('checklist', '0001_initial'),
+        ("checklist", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CollaborationGroup',
+            name="CollaborationGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('descricao', models.TextField(blank=True, default='', max_length=100)),
-                ('membros', models.ManyToManyField(blank=True, related_name='grupos_que_participo', to=settings.AUTH_USER_MODEL)),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='grupos_que_criei', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100)),
+                ("descricao", models.TextField(blank=True, default="", max_length=100)),
+                (
+                    "membros",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="grupos_que_participo",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "owner",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="grupos_que_criei",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'unique_together': {('name', 'owner')},
+                "ordering": ["-created_at"],
+                "unique_together": {("name", "owner")},
             },
         ),
         migrations.CreateModel(
-            name='Folder',
+            name="Folder",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(default='folder', max_length=100)),
-                ('colaboradores', models.ManyToManyField(blank=True, related_name='pastas_compartilhadas', to=settings.AUTH_USER_MODEL)),
-                ('grupos_colaboracao', models.ManyToManyField(blank=True, related_name='pastas_compartilhadas', to='main.collaborationgroup')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='minhas_pastas', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(default="folder", max_length=100)),
+                (
+                    "colaboradores",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="pastas_compartilhadas",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "grupos_colaboracao",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="pastas_compartilhadas",
+                        to="main.collaborationgroup",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="minhas_pastas",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('name', 'user')},
+                "unique_together": {("name", "user")},
             },
         ),
         migrations.CreateModel(
-            name='Todo',
+            name="Todo",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('titulo', models.CharField(default='Sem titulo', max_length=100)),
-                ('favorito', models.BooleanField(default=False)),
-                ('completo', models.BooleanField(default=False)),
-                ('anotacao', models.TextField(default='Escreva algo aqui!', max_length=15000, verbose_name='Anotação')),
-                ('prioridade', models.CharField(choices=[('Baixa', '1'), ('Média', '2'), ('Alta', '3')], default='1', max_length=100)),
-                ('tag', models.CharField(choices=[('Atividade', 'Atividade'), ('Anotação', 'Anotação'), ('Prova', 'prova'), ('Arquivo', 'Arquivo'), ('Urgente', 'Urgente'), ('Importante.', 'Importante'), ('Tarefa', 'Tarefa'), ('Link', 'Link'), ('Lembrete.', 'Lembrete'), ('Avulso', 'Avulso'), ('Outro', 'Outro')], default='Avulso', max_length=100)),
-                ('prazo_inicial', models.DateField(default=django.utils.timezone.now, help_text='2026-09-26')),
-                ('prazo_final', models.DateField(default=django.utils.timezone.now, help_text='2026-09-26')),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Data de Atualização')),
-                ('colaboradores', models.ManyToManyField(blank=True, related_name='todos_compartilhados', to=settings.AUTH_USER_MODEL)),
-                ('folder', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='todos', to='main.folder')),
-                ('grupos_colaboracao', models.ManyToManyField(blank=True, related_name='todos_compartilhados', to='main.collaborationgroup')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='meus_todos', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("titulo", models.CharField(default="Sem titulo", max_length=100)),
+                ("favorito", models.BooleanField(default=False)),
+                ("completo", models.BooleanField(default=False)),
+                (
+                    "anotacao",
+                    models.TextField(
+                        default="Escreva algo aqui!",
+                        max_length=15000,
+                        verbose_name="Anotação",
+                    ),
+                ),
+                (
+                    "prioridade",
+                    models.CharField(
+                        choices=[("Baixa", "1"), ("Média", "2"), ("Alta", "3")],
+                        default="1",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "tag",
+                    models.CharField(
+                        choices=[
+                            ("Atividade", "Atividade"),
+                            ("Anotação", "Anotação"),
+                            ("Prova", "prova"),
+                            ("Arquivo", "Arquivo"),
+                            ("Urgente", "Urgente"),
+                            ("Importante.", "Importante"),
+                            ("Tarefa", "Tarefa"),
+                            ("Link", "Link"),
+                            ("Lembrete.", "Lembrete"),
+                            ("Avulso", "Avulso"),
+                            ("Outro", "Outro"),
+                        ],
+                        default="Avulso",
+                        max_length=100,
+                    ),
+                ),
+                (
+                    "prazo_inicial",
+                    models.DateField(default=django.utils.timezone.now, help_text="2026-09-26"),
+                ),
+                (
+                    "prazo_final",
+                    models.DateField(default=django.utils.timezone.now, help_text="2026-09-26"),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="Data de Atualização"),
+                ),
+                (
+                    "colaboradores",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="todos_compartilhados",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "folder",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="todos",
+                        to="main.folder",
+                    ),
+                ),
+                (
+                    "grupos_colaboracao",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="todos_compartilhados",
+                        to="main.collaborationgroup",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="meus_todos",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Image',
+            name="Image",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('img', models.ImageField(upload_to=main.models._upload_imagem_path)),
-                ('descricao', models.CharField(default='Imagem sem descriçao', max_length=100)),
-                ('titulo', models.CharField(default='Sem titulo', max_length=100)),
-                ('data_de_criacao', models.DateField(default=django.utils.timezone.now)),
-                ('observacao', models.CharField(default='Sem observação', max_length=100)),
-                ('todo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='imagens', to='main.todo')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("img", models.ImageField(upload_to=main.models._upload_imagem_path)),
+                (
+                    "descricao",
+                    models.CharField(default="Imagem sem descriçao", max_length=100),
+                ),
+                ("titulo", models.CharField(default="Sem titulo", max_length=100)),
+                (
+                    "data_de_criacao",
+                    models.DateField(default=django.utils.timezone.now),
+                ),
+                (
+                    "observacao",
+                    models.CharField(default="Sem observação", max_length=100),
+                ),
+                (
+                    "todo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="imagens",
+                        to="main.todo",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='LinkerTaskTodo',
+            name="LinkerTaskTodo",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('tarefa', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='vinculos_anotacoes', to='checklist.tarefa')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('todo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='vinculos_tarefas', to='main.todo')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "tarefa",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="vinculos_anotacoes",
+                        to="checklist.tarefa",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "todo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="vinculos_tarefas",
+                        to="main.todo",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('todo', 'user', 'tarefa')},
+                "unique_together": {("todo", "user", "tarefa")},
             },
         ),
     ]

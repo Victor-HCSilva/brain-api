@@ -43,7 +43,6 @@ class Agenda:
                     id_user=id_user,
                 )
 
-
         agora = datetime.now()
         ano_visualizado = ano or agora.year
         mes_visualizado = mes or agora.month
@@ -140,11 +139,10 @@ class Configs:
                 config.user = user
                 config.save()
                 return redirect("agenda:agenda", id_user=id_user)
-            
+
             already_exists.cor_de_destaque = self.request.POST.get("cor_de_destaque")
             already_exists.save()
             return redirect("agenda:agenda", id_user=id_user)
-
 
         return render(self.request, "configs.html", context)
 

@@ -110,17 +110,15 @@ class TodoFormComColaboradores(ModelForm):
             self.fields["colaboradores"].queryset = User.objects.exclude(id=user.id)
 
             # Filtra grupos - apenas grupos que o usuário criou
-            self.fields[
-                "grupos_colaboracao"
-            ].queryset = CollaborationGroup.objects.filter(owner=user, is_active=True)
+            self.fields["grupos_colaboracao"].queryset = CollaborationGroup.objects.filter(
+                owner=user, is_active=True
+            )
 
 
 class UserForm(forms.ModelForm):
     password = forms.CharField(
         label="Senha:",
-        widget=forms.PasswordInput(
-            attrs={"class": "input", "placeholder": "Digite sua senha"}
-        ),
+        widget=forms.PasswordInput(attrs={"class": "input", "placeholder": "Digite sua senha"}),
     )
 
     class Meta:
@@ -147,9 +145,7 @@ class ImageForm(forms.ModelForm):
         # Inclua os campos do seu modelo Image que o usuário deve preencher
         fields = ["titulo", "observacao", "img"]
         widgets = {
-            "titulo": forms.TextInput(
-                attrs={"class": "input", "placeholder": "Título da imagem"}
-            ),
+            "titulo": forms.TextInput(attrs={"class": "input", "placeholder": "Título da imagem"}),
             "observacao": forms.Textarea(
                 attrs={
                     "class": "textarea",
@@ -220,9 +216,7 @@ class FolderFormComColaboradores(forms.ModelForm):
         model = Folder
         fields = ["name", "colaboradores", "grupos_colaboracao"]
         widgets = {
-            "name": forms.TextInput(
-                attrs={"class": "input", "placeholder": "Nome da pasta"}
-            ),
+            "name": forms.TextInput(attrs={"class": "input", "placeholder": "Nome da pasta"}),
             "colaboradores": forms.CheckboxSelectMultiple(),
             "grupos_colaboracao": forms.CheckboxSelectMultiple(),
         }
@@ -236,9 +230,9 @@ class FolderFormComColaboradores(forms.ModelForm):
             self.fields["colaboradores"].queryset = User.objects.exclude(id=user.id)
 
             # Filtra grupos - apenas grupos que o usuário criou
-            self.fields[
-                "grupos_colaboracao"
-            ].queryset = CollaborationGroup.objects.filter(owner=user, is_active=True)
+            self.fields["grupos_colaboracao"].queryset = CollaborationGroup.objects.filter(
+                owner=user, is_active=True
+            )
 
 
 class CollaborationGroupForm(forms.ModelForm):
@@ -248,9 +242,7 @@ class CollaborationGroupForm(forms.ModelForm):
         model = CollaborationGroup
         fields = ["name", "descricao", "membros"]
         widgets = {
-            "name": forms.TextInput(
-                attrs={"class": "input", "placeholder": "Nome do grupo"}
-            ),
+            "name": forms.TextInput(attrs={"class": "input", "placeholder": "Nome do grupo"}),
             "descricao": forms.Textarea(
                 attrs={
                     "class": "textarea",
@@ -285,15 +277,11 @@ class AddColaboradorForm(forms.Form):
 class LinkerTaskTodoForm(forms.ModelForm):
     class Meta:
         model = LinkerTaskTodo
-        fields = [
-            "tarefa"
-        ]  # O usuário selecionará apenas qual checklist deseja vincular
+        fields = ["tarefa"]  # O usuário selecionará apenas qual checklist deseja vincular
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         if user:
             # Filtra o Select para mostrar apenas os checklists ativos do próprio usuário
-            self.fields["tarefa"].queryset = Tarefa.objects.filter(
-                user=user, is_active=True
-            )
+            self.fields["tarefa"].queryset = Tarefa.objects.filter(user=user, is_active=True)

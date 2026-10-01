@@ -46,7 +46,9 @@ class GroupMemberSerializer(serializers.Serializer):
     def validate(self, attrs):
         user_val = attrs.get("user") or attrs.get("username") or attrs.get("user_id")
         if not user_val:
-            raise serializers.ValidationError({"detail": "Informe o nome de usuário ou o ID do colaborador."})
+            raise serializers.ValidationError(
+                {"detail": "Informe o nome de usuário ou o ID do colaborador."}
+            )
 
         user = None
         user_str = str(user_val).strip()
@@ -60,17 +62,16 @@ class GroupMemberSerializer(serializers.Serializer):
             user = User.objects.filter(username__iexact=user_str).first()
 
         if user is None:
-            raise serializers.ValidationError({"detail": f"Usuário '{user_str}' não foi encontrado."})
+            raise serializers.ValidationError(
+                {"detail": f"Usuário '{user_str}' não foi encontrado."}
+            )
 
         attrs["user"] = user
         return attrs
 
 
-
 class ShareSerializer(serializers.Serializer):
-    user_ids = serializers.ListField(
-        child=serializers.CharField(), required=False
-    )
+    user_ids = serializers.ListField(child=serializers.CharField(), required=False)
     group_ids = serializers.PrimaryKeyRelatedField(
         source="groups",
         queryset=CollaborationGroup.objects.filter(is_active=True),
@@ -89,11 +90,12 @@ class ShareSerializer(serializers.Serializer):
             if u is None:
                 u = User.objects.filter(username__iexact=u_str).first()
             if u is None:
-                raise serializers.ValidationError({"detail": f"Usuário '{u_str}' não foi encontrado."})
+                raise serializers.ValidationError(
+                    {"detail": f"Usuário '{u_str}' não foi encontrado."}
+                )
             users.append(u)
         attrs["users"] = users
 
         if not attrs.get("users") and not attrs.get("groups"):
             raise serializers.ValidationError("Informe ao menos um usuário ou grupo.")
         return attrs
-
