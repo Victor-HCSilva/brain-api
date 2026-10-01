@@ -118,7 +118,8 @@ def _send_summarie(user_id: int | str):
     except Exception as e:
         logger.info(f"Erro ocorrido ao tentar enviar emails: {e}")
 
-def send_summarie_massive(filters = {"is_active": True}):
+@shared_task
+def send_summarie_massive(filters = {"is_active": True}): #
     """Envio a resumos de anotações para cada usuário"""
     ids = User.objects.filter(**filters).values_list("id", flat=True)
     for user_id in ids:

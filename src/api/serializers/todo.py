@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from main.models import Folder, LinkerTaskTodo, Todo
 from api.email.script import send_delay
-from api.tasks.send_summaries_task import send_summarie_massive
+from main.models import Folder, LinkerTaskTodo, Todo
+
 
 class FolderSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -33,6 +33,7 @@ class FolderSerializer(serializers.ModelSerializer):
 
 class LinkerTaskTodoSerializer(serializers.ModelSerializer):
     """Serializer for LinkerTaskTodo – links a Tarefa (checklist) to a Todo (note)."""
+
     tarefa_titulo = serializers.SerializerMethodField()
     tarefa_color = serializers.SerializerMethodField()
 
@@ -52,9 +53,13 @@ class LinkerTaskTodoSerializer(serializers.ModelSerializer):
         todo = data.get("todo")
         tarefa = data.get("tarefa")
         if todo and todo.user != request.user:
-            raise serializers.ValidationError({"todo": "Você não tem permissão para esta tarefa."})
+            raise serializers.ValidationError(
+                {"todo": "Você não tem permissão para esta tarefa."}
+            )
         if tarefa and tarefa.user != request.user:
-            raise serializers.ValidationError({"tarefa": "Você não tem permissão para esta lista."})
+            raise serializers.ValidationError(
+                {"tarefa": "Você não tem permissão para esta lista."}
+            )
         return data
 
     def create(self, validated_data):
@@ -138,8 +143,6 @@ class TodoSerializer(serializers.ModelSerializer):
         validated_data["user"] = request.user
         username = request.user.username
         titulo = validated_data.get("titulo", "Titulo não encontrado")
-        send_summarie_massive()
-        # t = f"Criada nova anotação - {titulo}"
-        # c = f"{username}, continue assim! Gerencie, estude e registre 📝"
+        c = f"{username}, continue assim! Gerencie, estude e registre 📝"
         s = send_delay.delay(to_user=request.user.id, content=c, title=t)
         return super().create(validated_data)

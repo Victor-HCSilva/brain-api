@@ -108,7 +108,7 @@ class SendEmail:
 		try:
 			if not self.to_user.email or not self.email:
 				logger.info(f"Usuário: {self.to_user.email}\nSistema: {self.email}")
-				raise ValueError("Algum erro ocorru ao buscar emails")
+				raise ValueError("Algum erro ocorreu ao buscar emails")
 
 
 			from_ = self.email

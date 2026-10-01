@@ -1,7 +1,9 @@
+name: brain
+
 services:
   db:
     image: postgres:16-alpine
-    container_name: django_postgres
+    container_name: brain_postgres
     restart: always
     env_file:
       - ../.envs/.env
@@ -22,7 +24,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: django_redis
+    container_name: brain_redis
     restart: always
     ports:
       - "6379:6379"
@@ -41,7 +43,7 @@ services:
     build:
       context: ..
       dockerfile: .docker/dockerfile/Dockerfile
-    container_name: django_api
+    container_name: brain_api
     restart: always
     command: python manage.py runserver 0.0.0.0:7655
     volumes:
@@ -65,7 +67,7 @@ services:
     build:
       context: ..
       dockerfile: .docker/dockerfile/Dockerfile
-    container_name: django_celery_worker
+    container_name: brain_celery_worker
     restart: always
     # DICA: Adicionado --concurrency=1 para não criar múltiplos processos na sua máquina
     command: python -m celery -A core worker -l info --concurrency=1
@@ -88,7 +90,7 @@ services:
     build:
       context: ..
       dockerfile: .docker/dockerfile/Dockerfile
-    container_name: django_celery_beat
+    container_name: brain_celery_beat
     restart: always
     command: python -m celery -A core beat -l info
     volumes:
