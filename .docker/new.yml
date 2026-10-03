@@ -1,4 +1,4 @@
-ame: brain
+me: brain
 services:
   db:
     image: postgres:16-alpine

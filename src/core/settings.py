@@ -14,8 +14,8 @@ SRC_DIR = CURRENT_FILE.parent.parent
 
 BASE_DIR = SRC_DIR.parent
 
-if str(SRC_DIR) not in sys.path:
-    sys.path.insert(0, str(SRC_DIR))
+# if str(SRC_DIR) not in sys.path:
+sys.path.insert(0, str(SRC_DIR))
 
 DOTENV_PATH = BASE_DIR / ".envs" / ".env"
 load_dotenv(DOTENV_PATH)
@@ -134,7 +134,7 @@ DATABASES = {
 }
 
 try:
-    import django_redis  # noqa: F401
+    import django_redis
 
     CACHES = {
         "default": {
@@ -209,12 +209,12 @@ CELERY_BROKER_URL = REDIS
 CELERY_RESULT_BACKEND = REDIS
 CELERY_TIMEZONE = TIME_ZONE
 
-CELERY_BEAT_SCHEDULE = {
-    "send-daily-summaries": {
-        "task": "api.tasks.send_summarie_massive",
-        "schedule": crontab(hour=6, minute=0),
-    },
-}
+# CELERY_BEAT_SCHE'DULE = {
+#     "send-daily-summaries": {
+#         "task": "api.tasks.send_summarie_massive",
+#         "schedule": crontab(hour=20, minute=35),
+#     },
+# }'
 
 if not DEBUG:
     # Cookies seguros só trafegam via HTTPS

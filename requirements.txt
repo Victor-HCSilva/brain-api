@@ -13,3 +13,4 @@ typing_extensions==4.13.2
 psycopg2==2.9.13
 django-redis==7.0.0
 celery==5.6.3
+gTTS==2.5.4
