@@ -50,6 +50,9 @@ class AgendaModel(ActivableAndTimeStamp):
         default=PRIORIDADES[0][0],
     )
     dia_do_evento = models.DateTimeField("Data do evento", default=timezone.now)
+    email_notification_at = models.DateTimeField(null=True, blank=True)
+    email_notification_message = models.CharField(max_length=500, blank=True, default="")
+    email_notification_sent_at = models.DateTimeField(null=True, blank=True, editable=False)
 
     class Meta:
         ordering = ["dia_do_evento"]

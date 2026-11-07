@@ -3,6 +3,10 @@ PYTHON = python
 MANAGE = src/manage.py
 VENV_DIR = .venv
 PIP = $(VENV_DIR)/bin/pip
+COMPOSE_FILE = .docker/docker-compose.yml
+INTERFACE_PORT = 3000
+
+.PHONY: dev install runserver run_docker ngrok
 
 # Para Windows, use:
 # PYTHON = python
@@ -29,4 +33,8 @@ runserver:
 	$(VENV_DIR)/bin/$(PYTHON) $(MANAGE) runserver
 
 run_docker:
-	docker compose -f .docker/docker-compose.yml up --build
+	docker compose -f $(COMPOSE_FILE) up --build
+
+ngrok:
+	docker compose -f $(COMPOSE_FILE) up --build --detach
+	ngrok http $(INTERFACE_PORT)

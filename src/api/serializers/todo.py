@@ -83,6 +83,9 @@ class TodoSerializer(serializers.ModelSerializer):
             "tag",
             "prazo_inicial",
             "prazo_final",
+            "email_notification_at",
+            "email_notification_message",
+            "email_notification_sent_at",
             "folder",
             "colaboradores",
             "grupos_colaboracao",
@@ -97,6 +100,7 @@ class TodoSerializer(serializers.ModelSerializer):
             "grupos_colaboracao",
             "created_at",
             "updated_at",
+            "email_notification_sent_at",
             "is_active",
         ]
 
@@ -132,11 +136,40 @@ class TodoSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Você não tem permissão para usar esta pasta.")
         return value
 
+    def validate(self, attrs):
+        request_user = self.context["request"].user
+        notification_fields = ("email_notification_at", "email_notification_message")
+        notification_changed = any(field in attrs for field in notification_fields)
+        if self.instance and notification_changed and self.instance.user_id != request_user.id:
+            raise serializers.ValidationError(
+                {"email_notification_at": "Somente o proprietário pode gerenciar esta notificação."}
+            )
+
+        notification_owner = self.instance.user if self.instance else request_user
+        notification_at = attrs.get(
+            "email_notification_at",
+            getattr(self.instance, "email_notification_at", None),
+        )
+        if notification_at and not notification_owner.email:
+            raise serializers.ValidationError(
+                {"email_notification_at": "Cadastre um e-mail para receber notificações."}
+            )
+        return attrs
+
+    def update(self, instance, validated_data):
+        notification_changed = any(
+            field in validated_data and validated_data[field] != getattr(instance, field)
+            for field in ("email_notification_at", "email_notification_message")
+        )
+        if notification_changed:
+            validated_data["email_notification_sent_at"] = None
+        return super().update(instance, validated_data)
+
     def create(self, validated_data):
         request = self.context["request"]
         validated_data["user"] = request.user
         username = request.user.username
-        titulo = validated_data.get("titulo", "Titulo não encontrado")
+        t = validated_data.get("titulo", "Titulo não encontrado")
         c = f"{username}, continue assim! Gerencie, estude e registre 📝"
-        s = send_delay.delay(to_user=request.user.id, content=c, title=t)
+        send_delay.delay(to_user=request.user.id, content=c, title=t)
         return super().create(validated_data)

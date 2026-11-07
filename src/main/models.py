@@ -170,6 +170,9 @@ class Todo(ActivableAndTimeStamp):
     prazo_final = models.DateTimeField(
         default=timezone.now, help_text=f"{str(timezone.now().date())}"
     )
+    email_notification_at = models.DateTimeField(null=True, blank=True)
+    email_notification_message = models.CharField(max_length=500, blank=True, default="")
+    email_notification_sent_at = models.DateTimeField(null=True, blank=True, editable=False)
     is_active = models.BooleanField(default=True)
 
     folder = models.ForeignKey(
@@ -277,3 +280,56 @@ class LinkerTaskTodo(ActivableAndTimeStamp):
 
     class Meta:
         unique_together = ["todo", "user", "tarefa"]
+
+
+def _upload_audio_path(instance, filename):
+    import os
+
+    ext = os.path.splitext(filename)[1].lower()
+    return f"audios/{uuid.uuid4().hex}{ext}"
+
+
+class AudioRecording(ActivableAndTimeStamp):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="audio_gravacoes")
+    titulo = models.CharField(max_length=MAX_LENGTH)
+    audio = models.FileField(upload_to=_upload_audio_path)
+    folder = models.ForeignKey(
+        Folder, on_delete=models.SET_NULL, blank=True, null=True, related_name="audio_gravacoes"
+    )
+
+    def __str__(self):
+        return self.titulo
+
+
+class LinkerAudioTodo(ActivableAndTimeStamp):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    todo = models.ForeignKey(Todo, on_delete=models.CASCADE, related_name="vinculos_audios")
+    audio = models.ForeignKey(
+        AudioRecording, on_delete=models.CASCADE, related_name="vinculos_todo"
+    )
+
+    class Meta:
+        unique_together = ["todo", "user", "audio"]
+
+
+class DrawDocument(ActivableAndTimeStamp):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="desenhos")
+    titulo = models.CharField(max_length=MAX_LENGTH)
+    folder = models.ForeignKey(
+        Folder, on_delete=models.SET_NULL, blank=True, null=True, related_name="desenhos"
+    )
+    drawing = models.JSONField(default=list)
+
+    def __str__(self):
+        return self.titulo
+
+
+class LinkerDrawTodo(ActivableAndTimeStamp):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    todo = models.ForeignKey(Todo, on_delete=models.CASCADE, related_name="vinculos_desenhos")
+    drawing = models.ForeignKey(
+        DrawDocument, on_delete=models.CASCADE, related_name="vinculos_todo"
+    )
+
+    class Meta:
+        unique_together = ["todo", "user", "drawing"]

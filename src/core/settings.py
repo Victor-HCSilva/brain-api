@@ -3,9 +3,8 @@ import os
 import sys
 from datetime import timedelta
 from pathlib import Path
-from celery.schedules import crontab
 from dotenv import load_dotenv
-from celery.schedules import crontab
+
 
 
 CURRENT_FILE = Path(__file__).resolve()
@@ -209,12 +208,12 @@ CELERY_BROKER_URL = REDIS
 CELERY_RESULT_BACKEND = REDIS
 CELERY_TIMEZONE = TIME_ZONE
 
-# CELERY_BEAT_SCHE'DULE = {
-#     "send-daily-summaries": {
-#         "task": "api.tasks.send_summarie_massive",
-#         "schedule": crontab(hour=20, minute=35),
-#     },
-# }'
+CELERY_BEAT_SCHEDULE = {
+    "send-due-email-notifications": {
+        "task": "api.tasks.send_reminders_task.send_due_email_notifications",
+        "schedule": timedelta(minutes=1),
+    },
+}
 
 if not DEBUG:
     # Cookies seguros só trafegam via HTTPS

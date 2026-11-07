@@ -48,20 +48,46 @@ services:
     command: python manage.py runserver 0.0.0.0:7655
     volumes:
       - ../src:/app/src
+      - ../media:/app/media
     ports:
       - "7655:7655"
     env_file:
       - ../.envs/.env
+    environment:
+      TRUSTED_ORIGINS: "localhost,127.0.0.1,api"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 7655), timeout=2).close()"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
     deploy:
       resources:
         limits:
           cpus: '0.80'    
           memory: 512M    
+
+  interface:
+    build:
+      context: ../../brain-interface
+      dockerfile: Dockerfile
+      args:
+        BACKEND_URL: http://api:7655
+    container_name: brain_interface
+    restart: always
+    environment:
+      BACKEND_URL: http://api:7655
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
 
   celery_worker:
     build:

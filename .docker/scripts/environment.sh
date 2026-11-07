@@ -20,7 +20,7 @@ done
 echo "Redis conectado com sucesso!"
 
 # Aplica migrações apenas na API
-if [ "$1" = "python" ] && [ "$2" = "manage.py" ] && [ "$3" = "runserver" ] && ["$4" = "7655"]; then
+if [ "$1" = "python" ] && [ "$2" = "manage.py" ] && [ "$3" = "runserver" ]; then
     echo "Aplicando migrações do banco de dados..."
     python manage.py migrate --noinput
 fi

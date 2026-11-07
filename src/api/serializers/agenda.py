@@ -41,16 +41,46 @@ class AgendaModelSerializer(serializers.ModelSerializer):
             "tipo_de_evento",
             "importancia",
             "dia_do_evento",
+            "email_notification_at",
+            "email_notification_message",
+            "email_notification_sent_at",
             "is_active",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "user", "created_at", "updated_at", "is_active"]
+        read_only_fields = [
+            "id",
+            "user",
+            "email_notification_sent_at",
+            "created_at",
+            "updated_at",
+            "is_active",
+        ]
 
     def create(self, validated_data):
         request = self.context["request"]
         validated_data["user"] = request.user
         return super().create(validated_data)
+
+    def validate(self, attrs):
+        notification_at = attrs.get(
+            "email_notification_at",
+            getattr(self.instance, "email_notification_at", None),
+        )
+        if notification_at and not self.context["request"].user.email:
+            raise serializers.ValidationError(
+                {"email_notification_at": "Cadastre um e-mail para receber notificações."}
+            )
+        return attrs
+
+    def update(self, instance, validated_data):
+        notification_changed = any(
+            field in validated_data and validated_data[field] != getattr(instance, field)
+            for field in ("email_notification_at", "email_notification_message")
+        )
+        if notification_changed:
+            validated_data["email_notification_sent_at"] = None
+        return super().update(instance, validated_data)
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

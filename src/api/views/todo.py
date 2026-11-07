@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Q
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -26,6 +27,14 @@ class FolderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            instance.todos.update(folder=None)
+            instance.audio_gravacoes.update(folder=None)
+            instance.desenhos.update(folder=None)
+            instance.is_active = False
+            instance.save(update_fields=["is_active", "updated_at"])
 
     @action(detail=True, methods=["post", "delete"], url_path="share")
     def share(self, request, pk=None):

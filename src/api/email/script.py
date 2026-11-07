@@ -1,13 +1,10 @@
 from django.shortcuts import get_object_or_404
-from django.db import models
 import smtplib
 from logging import getLogger
 import os
 from django.contrib.auth.models import User
 from email.message import EmailMessage
 from api.models import DispatchLog
-from django.core.cache import cache
-from django.core.management.utils import get_random_secret_key
 from time import sleep
 
 logger = getLogger("__main__")
@@ -31,14 +28,11 @@ except ImportError:
 
 
 class SendEmail:
-    timeout = 5  # 5s
     server_type = os.getenv("SERVER_TYPE")
     port = os.getenv("EMAIL_PORT")
     link = os.getenv("LINK_PAGINA")
     email = os.getenv("EMAIL_SYSTEM")
     password = os.getenv("EMAIL_PASSWORD")
-    success = "OK"
-    failure = "FAIL"
 
     def __init__(self, to_user: User, content: str, title: str, time=3) -> None:
         self.to_user = to_user
@@ -47,21 +41,16 @@ class SendEmail:
         self.time = time
 
     def _idempotency(self, smtp, msg: EmailMessage, time=3) -> None:
-        if time == 0 or cache.get(self.to_user.email) == self.success:
-            return
-
-        try:
-            sleep(1)
-            err = smtp.send_message(msg)
-
-            if err and cache.get(self.to_user.email) != self.success:
-                cache.set(self.to_user.email, self.failure)
-                return self._idempotency(smtp, msg, time - 1)
-
-            return cache.set(self.to_user.email, self.success, self.timeout)
-
-        except (smtplib.SMTPException, Exception) as e:
-            err = True
+        for attempt in range(time + 1):
+            try:
+                refused_recipients = smtp.send_message(msg)
+                if refused_recipients:
+                    raise smtplib.SMTPRecipientsRefused(refused_recipients)
+                return
+            except (smtplib.SMTPException, OSError):
+                if attempt == time:
+                    raise
+                sleep(1)
 
     def _template(self, username: str, content: str):
         return f"""
@@ -122,13 +111,14 @@ class SendEmail:
                 smtp.login(from_, self.password)
                 self._idempotency(smtp, msg, self.time)
 
-                obj = DispatchLog.objects.create(
+                DispatchLog.objects.create(
                     to=self.to_user, title=self.title, content=self.content
                 )
                 logger.info(f"E-mail de {from_} para {self.to_user.email} enviado com sucesso!")
 
-        except Exception as e:
-            logger.info(f"Erro ao enviar o email: {e}")
+        except Exception:
+            logger.exception("Erro ao enviar o email.")
+            raise
 
 
 @shared_task

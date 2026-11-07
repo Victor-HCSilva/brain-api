@@ -1,4 +1,9 @@
+import mimetypes
+
+from django.http import FileResponse
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -30,3 +35,18 @@ class ImageViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+
+    @action(detail=True, methods=["get"], url_path="file")
+    def file(self, request, pk=None):
+        image = self.get_object()
+        if not image.img:
+            raise NotFound("Arquivo de imagem não encontrado.")
+        try:
+            image_file = image.img.open("rb")
+        except FileNotFoundError as exc:
+            raise NotFound("Arquivo de imagem não encontrado.") from exc
+
+        content_type = mimetypes.guess_type(image.img.name)[0] or "application/octet-stream"
+        response = FileResponse(image_file, content_type=content_type)
+        response["X-Content-Type-Options"] = "nosniff"
+        return response

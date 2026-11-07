@@ -4,9 +4,13 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from api.views.agenda import AgendaModelViewSet, ColorsViewSet
 from api.views.auth import MeView, RegisterView
+from api.views.audio_recording import AudioRecordingViewSet, LinkerAudioTodoViewSet
+from api.views.draw import DrawDocumentViewSet, LinkerDrawTodoViewSet
 from api.views.checklist import ItemViewSet, LinkViewSet, TarefaViewSet
 from api.views.group import GroupViewSet
 from api.views.image import ImageViewSet
+from api.views.notification import ScheduledEmailNotificationViewSet
+from api.views.search import GlobalSearchView
 from api.views.todo import FolderViewSet, LinkerTaskTodoViewSet, TodoViewSet
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -37,6 +41,11 @@ router.register(r"checklist/links", LinkViewSet, basename="link")
 router.register(r"agenda/configs", ColorsViewSet, basename="colors")
 router.register(r"agenda", AgendaModelViewSet, basename="agenda")
 router.register(r"images", ImageViewSet, basename="image")
+router.register(r"notifications", ScheduledEmailNotificationViewSet, basename="notification")
+router.register(r"audio-recordings", AudioRecordingViewSet, basename="audio-recording")
+router.register(r"audio-linkers", LinkerAudioTodoViewSet, basename="audio-linker")
+router.register(r"drawings", DrawDocumentViewSet, basename="drawing")
+router.register(r"draw-linkers", LinkerDrawTodoViewSet, basename="draw-linker")
 router.register(r"linkers", LinkerTaskTodoViewSet, basename="linker")
 
 
@@ -59,5 +68,6 @@ urlpatterns = [
             ]
         ),
     ),
+    path("search/", GlobalSearchView.as_view(), name="search"),
     path("", include(router.urls)),
 ]

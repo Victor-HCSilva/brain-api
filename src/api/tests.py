@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
-from main.models import Folder, Todo
+from main.models import AudioRecording, DrawDocument, Folder, Image, Todo
 
 User = get_user_model()
 
@@ -111,6 +111,45 @@ class TodoAndFolderAPITests(APITestCase):
             [todo["id"] for todo in unfiled_response.data["results"]], [unfiled_todo.id]
         )
 
+    def test_owner_can_delete_folder_without_deleting_its_content(self):
+        audio = AudioRecording.objects.create(
+            user=self.owner, titulo="Áudio", folder=self.folder
+        )
+        drawing = DrawDocument.objects.create(
+            user=self.owner, titulo="Desenho", folder=self.folder
+        )
+        self.client.force_authenticate(user=self.owner)
+
+        response = self.client.delete(
+            reverse("api:folder-detail", kwargs={"pk": self.folder.pk})
+        )
+
+        self.assertEqual(response.status_code, 204)
+        self.folder.refresh_from_db()
+        self.todo.refresh_from_db()
+        audio.refresh_from_db()
+        drawing.refresh_from_db()
+        self.assertFalse(self.folder.is_active)
+        self.assertTrue(self.todo.is_active)
+        self.assertIsNone(self.todo.folder)
+        self.assertIsNone(audio.folder)
+        self.assertIsNone(drawing.folder)
+        self.assertEqual(
+            self.client.get(reverse("api:folder-list")).data["results"], []
+        )
+
+    def test_folder_collaborator_cannot_delete_folder(self):
+        self.folder.colaboradores.add(self.other)
+        self.client.force_authenticate(user=self.other)
+
+        response = self.client.delete(
+            reverse("api:folder-detail", kwargs={"pk": self.folder.pk})
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.folder.refresh_from_db()
+        self.assertTrue(self.folder.is_active)
+
 
 class SwaggerAPITests(APITestCase):
     def test_schema_and_swagger_ui_are_available(self):
@@ -160,6 +199,53 @@ class ImageAPITests(APITestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["titulo"], "Imagem da tarefa")
+
+    def test_owner_can_view_uploaded_image_through_authenticated_file_endpoint(self):
+        from tempfile import TemporaryDirectory
+
+        from django.core.files.base import ContentFile
+        from django.test import override_settings
+
+        gif_bytes = (
+            b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04"
+            b"\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
+        )
+        with TemporaryDirectory() as media_dir, override_settings(MEDIA_ROOT=media_dir):
+            image = Image.objects.create(
+                img=ContentFile(gif_bytes, name="test.gif"),
+                todo=self.todo,
+                titulo="Imagem de teste",
+            )
+            self.client.force_authenticate(user=self.owner)
+
+            response = self.client.get(
+                reverse("api:image-file", kwargs={"pk": image.pk})
+            )
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response["Content-Type"], "image/gif")
+            self.assertEqual(response["X-Content-Type-Options"], "nosniff")
+            self.assertEqual(b"".join(response.streaming_content), gif_bytes)
+
+    def test_user_without_todo_access_cannot_view_image_file(self):
+        from tempfile import TemporaryDirectory
+
+        from django.core.files.base import ContentFile
+        from django.test import override_settings
+
+        with TemporaryDirectory() as media_dir, override_settings(MEDIA_ROOT=media_dir):
+            image = Image.objects.create(
+                img=ContentFile(b"image data", name="private.png"),
+                todo=self.todo,
+                titulo="Imagem privada",
+            )
+            self.client.force_authenticate(user=self.other)
+
+            response = self.client.get(
+                reverse("api:image-file", kwargs={"pk": image.pk})
+            )
+
+            self.assertEqual(response.status_code, 404)
 
     def test_other_user_cannot_upload_image_to_todo(self):
         from django.core.files.uploadedfile import SimpleUploadedFile
